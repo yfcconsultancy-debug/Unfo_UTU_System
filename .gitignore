@@ -1,0 +1,5 @@
+# Ignore Google Cloud credentials
+credentials.json
+
+# Ignore Python virtual environment
+.venv/

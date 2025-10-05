@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party Pass Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #faf3e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .container { background-color: #ffffff; padding: 30px 40px; border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); max-width: 500px; width: 100%; }
+        h2 { color: #333; text-align: center; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { color: #555; margin-bottom: 5px; display: block; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; color: #333; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 10px; background-color: #ff007f; color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: background-color 0.3s ease; }
+        button:hover { background-color: #c60065; }
+        #result-container { text-align: center; }
+        #final-image { max-width: 100%; border-radius: 15px; margin-top: 20px; }
+        #download-btn { background-color: #28a745; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="form-container">
+            <h2>Party Pass Generator</h2>
+            <form id="invite-form">
+                <div class="form-group"><label for="name">Your Name:</label><input type="text" id="name" name="name" required></div>
+                <div class="form-group"><label for="year">Year:</label><select id="year" name="year" required><option value="" disabled selected>Select your year</option><option value="1st">1st</option><option value="2nd">2nd</option></select></div>
+                <div class="form-group"><label for="section">Section:</label><input type="text" id="section" name="section" required></div>
+                <div class="form-group"><label for="date">Date of Birth:</label><input type="date" id="date" name="date" required></div>
+                <div class="form-group"><label for="mobile">Mobile Number:</label><input type="tel" id="mobile" name="mobile" required></div>
+                <div class="form-group"><label for="profilePic">Your Picture:</label><input type="file" id="profilePic" name="profilePic" accept="image/*" required></div>
+                <button type="submit">Generate My Pass!</button>
+                <p id="status" style="text-align:center; margin-top:15px;"></p>
+            </form>
+        </div>
+
+        <div id="result-container" style="display: none;">
+            <h2>Your Pass is Ready!</h2>
+            <img id="final-image" src="" alt="Generated Party Pass">
+            <a id="download-btn" href="#" download="party-pass.png"><button type="button">Download Pass</button></a>
+            <button onclick="startOver()">Create Another</button>
+        </div>
+    </div>
+<script>
+    const formContainer = document.getElementById('form-container');
+    const resultContainer = document.getElementById('result-container');
+    const form = document.getElementById('invite-form');
+    const statusEl = document.getElementById('status');
+    const finalImage = document.getElementById('final-image');
+    const downloadBtn = document.getElementById('download-btn');
+    
+    // The URL now points to our Vercel API endpoint
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwb_qZbLx1Gy_xXhAyUp8w6Hgu9QGWmlEiE-6Wzxs_t203AUlO3Dyw2weV3Xe4R41BoEw/exec';
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        statusEl.textContent = 'Generating... This might take a minute!';
+        
+        const file = form.profilePic.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onload = event => {
+            const payload = {
+                file: event.target.result, // Send the full data URL
+                name: form.name.value,
+                date: form.date.value,
+                mobile: form.mobile.value,
+                year: form.year.value,
+                section: form.section.value
+            };
+
+            fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // The backend sends the finished image as a data URL
+                        const finalImageDataUrl = `data:image/png;base64,${data.image}`;
+                        finalImage.src = finalImageDataUrl;
+                        downloadBtn.href = finalImageDataUrl;
+                        
+                        formContainer.style.display = 'none';
+                        resultContainer.style.display = 'block';
+                    } else {
+                        statusEl.textContent = 'Error: ' + data.message;
+                    }
+                })
+                .catch(error => {
+                    statusEl.textContent = 'A critical error occurred.';
+                });
+        };
+    });
+
+    function startOver() {
+        resultContainer.style.display = 'none';
+        formContainer.style.display = 'block';
+        form.reset();
+        statusEl.textContent = '';
+    }
+</script>
+</body>
+</html>

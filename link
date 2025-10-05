@@ -1,0 +1,12 @@
+https://script.google.com/macros/s/AKfycbwb_qZbLx1Gy_xXhAyUp8w6Hgu9QGWmlEiE-6Wzxs_t203AUlO3Dyw2weV3Xe4R41BoEw/exec
+https://drive.google.com/file/d/1dbBiNPzUQix5Otj9cUIng29UqlBAjAps/view?usp=sharing
+
+/vercel-invite-app/
+|-- index.html              (Your form)
+|-- requirements.txt        (Python libraries)
+|-- /api/
+|   |-- generator.py        (The Python serverless function)
+|   |-- Poppins-Bold.ttf    (Font file)
+|   |-- Poppins-Regular.ttf (Font file)
+|-- /assets/
+    |-- background.png 
